@@ -1,0 +1,34 @@
+{% load blog_tags %}
+{% get_site_configs as site_configs %}
+
+<footer id="footer">
+    <div class="social-wrapper">
+        {% if site_configs.email %}
+        <a href="mailto:{{ site_configs.email }}" class="social fas fa-envelope" target="_blank" rel="external noopener noreferrer nofollow"></a>
+        {% endif %}
+
+        {% if site_configs.github %}
+        <a href="{{ site_configs.github }}" class="social fab fa-github" target="_blank" rel="external nofollow noopener noreferrer"></a>
+        {% endif %}
+
+        {% if site_configs.zhihu %}
+        <a href="{{ site_configs.zhihu }}" class="social fab fa-weibo" target="_blank" rel="external nofollow noopener noreferrer"></a>
+        {% endif %}
+
+        {% if site_configs.twitter %}
+        <a href="{{ site_configs.twitter }}" class="social fab fa-twitter" target="_blank" rel="external nofollow noopener noreferrer"></a>
+        {% endif %}
+
+
+
+    </div>
+    <p><a href="{% url 'home' %}" target="_blank">Copyright © 2016-<span id="NowYear" ></span> {{ site_configs.name }}</a></p>
+    {% if site_configs.beian %}
+    <p><a href="http://beian.miit.gov.cn/" rel="external nofollow" target="_blank">{{ site_configs.beian }}</a></p>
+    {% endif %}
+
+</footer>
+<script>
+    var x = document.getElementById("NowYear");x.innerHTML = new Date().getFullYear();
+</script>
+

@@ -1,0 +1,151 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+{% load static %}
+{% block title %}{{ site_configs.name }} - {{ article.title }}{% endblock %}
+
+
+
+
+
+
+{% block l_main %}
+    <div class="l_main">
+        <!-- 正文部分 -->
+        <article id="post" class="post white-box article-type-post" itemscope="" itemprop="blogPost">
+            <!-- 标题 -->
+            <section class="meta">
+                <div class="meta" id="header-meta">
+                    <h1 class="title">{{ article.title }}</h1>
+                    <div class="new-meta-box">
+                        <div class="new-meta-item author"><a href="{% url 'blog:category_index' article.category.name %}"><i class="fas fa-list" aria-hidden="true"></i>{{ article.category.name }}</a></div>
+                        <div class="new-meta-item date"><a class="notlink"><i class="fas fa-clock" aria-hidden="true"></i> {{ article.created_time | date:'Y-m-d H:i:s' }}</a></div>
+                        <div class="new-meta-item browse busuanzi"><a class="notlink"><i class="fas fa-eye" aria-hidden="true"></i> <span id="busuanzi_value_page_pv">{{ article.views }}</span></a></div>
+                    </div>
+                    <hr>
+                </div>
+            </section>
+            <!-- 正文 -->
+            <section class="article typo">
+                <div class="article-entry" itemprop="articleBody">{{ article.content | make_markdown | safe }}</div>
+
+                <section class="meta" id="footer-meta">
+                    <hr>
+                    <div class="new-meta-box">
+                        {% for tag in article.tags.all %}
+                            <div class="new-meta-item meta-tags"><a class="tag" href="{% url 'blog:tag_index' tag.name %}"><i class="fas fa-tag" aria-hidden="true"></i>&nbsp;{{ tag.name }}</a></div>
+                        {% endfor %}
+                        <div class="new-meta-item date" itemprop="dateUpdated">
+                            <a class="notlink"><i class="fas fa-pencil-alt" aria-hidden="true"></i> {{ article.modified_time | date:'Y-m-d H:i:s' }}</a>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="prev-next">
+                    {% if article.get_previous_by_created_time %}
+                        {% if article.get_previous_by_created_time.post_type == 'article' %}
+                        <section class="prev">
+                    <span class="art-item-left">
+                        <h4><a href="{{ article.get_previous_by_created_time.get_absolute_url }}" rel="prev" title="{{ article.get_previous_by_created_time.title }}"><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp; {{ article.get_previous_by_created_time.title }}</a></h4>
+                    </span>
+                        </section>
+                            {% endif %}
+                    {% endif %}
+                    {% if article.get_next_by_created_time %}
+                        {% if article.get_next_by_created_time.post_type == 'article' %}
+                        <section class="next">
+                    <span class="art-item-right" aria-hidden="true">
+                        <h4><a href="{{ article.get_next_by_created_time.get_absolute_url }}" rel="prev" title="{{ article.get_next_by_created_time.title }}">{{ article.get_next_by_created_time.title }}&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></a></h4>
+                    </span>
+                        </section>
+                            {% endif %}
+                    {% endif %}
+                    <!-- 弹出div -->
+                    <div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:2;width:100%;height:200%;display:none;">
+                        <div id="innerdiv" style="position:absolute;">
+                            <img id="bigimg" style="border:5px solid #fff;" src="" />
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- 图片放大 -->
+                <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+                <script type="text/javascript">
+                $("body").on('click','img',function(){  
+                    var _this = $(this);//将当前的img元素作为_this传入函数  
+                    imgShow("#outerdiv", "#innerdiv", "#bigimg", _this);  
+                }); 
+                function imgShow(outerdiv, innerdiv, bigimg, _this){  
+                    var src = _this.attr("src");//获取当前点击的pimg元素中的src属性  
+                    $(bigimg).attr("src", src);//设置#bigimg元素的src属性  
+                        /*获取当前点击图片的真实大小，并显示弹出层及大图*/  
+                    $("<img/>").attr("src", src).load(function(){  
+                        var windowW = $(window).width();//获取当前窗口宽度  
+                        var windowH = $(window).height();//获取当前窗口高度  
+                        var realWidth = this.width;//获取图片真实宽度  
+                        var realHeight = this.height;//获取图片真实高度  
+                        var imgWidth, imgHeight;  
+                        var scale = 0.8;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放  
+                          
+                        if(realHeight>windowH*scale) {//判断图片高度  
+                            imgHeight = windowH*scale;//如大于窗口高度，图片高度进行缩放  
+                            imgWidth = imgHeight/realHeight*realWidth;//等比例缩放宽度  
+                            if(imgWidth>windowW*scale) {//如宽度扔大于窗口宽度  
+                                imgWidth = windowW*scale;//再对宽度进行缩放  
+                            }  
+                        } else if(realWidth>windowW*scale) {//如图片高度合适，判断图片宽度  
+                            imgWidth = windowW*scale;//如大于窗口宽度，图片宽度进行缩放  
+                                        imgHeight = imgWidth/realWidth*realHeight;//等比例缩放高度  
+                        } else {//如果图片真实高度和宽度都符合要求，高宽不变  
+                            imgWidth = realWidth;  
+                            imgHeight = realHeight;  
+                        }  
+                                $(bigimg).css("width",imgWidth);//以最终的宽度对图片缩放  
+                          
+                        var w = (windowW-imgWidth)/2;//计算图片与窗口左边距  
+                        var h = (windowH-imgHeight)/2;//计算图片与窗口上边距  
+                        $(innerdiv).css({"top":h, "left":w});//设置#innerdiv的top和left属性  
+                        $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg  
+                    });  
+                    $(outerdiv).click(function(){//再次点击淡出消失弹出层  
+                        $(this).fadeOut("fast");  
+                    });  
+                }  
+                </script>
+            </section>
+        </article>
+        <br>
+
+
+        <!-- 评论区 -->
+        <article class="post white-box comments">
+            <section class="article typo">
+                <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+
+                <!-- Gitalk 评论 start  -->
+                <!-- Link Gitalk 的支持文件  -->
+                <link rel="stylesheet" href="{% static 'css/gitalk.css' %}">
+                <script src="{% static 'js/gitalk.min.js' %}"></script>
+
+                <div id="gitalk-container"></div>
+                <script type="text/javascript">
+                    var gitalk = new Gitalk({
+                        // gitalk的主要参数
+                        clientID: '{{ site_configs.client_id }}',
+                        clientSecret: '{{ site_configs.client_secret }}',
+                        repo: '{{ site_configs.repo }}',
+                        owner: '{{ site_configs.owner }}',
+                        admin: ['{{ site_configs.admin }}'],
+                        id: "{{ article.get_absolute_url }}",
+                        distractionFreeMode: false
+                    });gitalk.render('gitalk-container');
+                </script>
+                <!-- Gitalk end -->
+
+            </section>
+        </article>
+
+        <script>window.subData={title:"{{ article.title }}",tools:!0}</script>
+
+    </div>
+{% endblock %}

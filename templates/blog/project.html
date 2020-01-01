@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load blog_tags %}
+{% get_site_configs as site_configs %}
+
+{% block title %}
+    {{ site_configs.name }} - 我的项目
+{% endblock %}
+
+{% block l_main %}
+    <div class="l_main">
+        <section class="post-list">
+            {% for project in projects %}
+                <div class="post-wrapper">
+                    <article class="post reveal" data-sr-id="0" style="visibility: visible; opacity: 1; transition: all 0.25s ease 0s, opacity 0.6s cubic-bezier(0.5, 0, 0, 1) 0s;">
+                        <section class="meta">
+                            <div class="meta" id="header-meta">
+                                <h2 class="title"><a href="{{ project.get_project_absolute_url }}">{{ project.title }}</a></h2>
+                                <div class="new-meta-box">
+                                    <div class="new-meta-item date"><a class="notlink"><i class="fas fa-clock" aria-hidden="true"></i>{{ project.created_time |date:'Y-m-d H:i' }}</a></div>
+                                    <div class="new-meta-item browse busuanzi"><a class="notlink"><i class="fas fa-eye" aria-hidden="true"></i>{{ project.views }}</a></div>
+                                </div>
+                                <hr>
+                            </div>
+                        </section>
+                        <section class="article typo">
+                            {{ project.description | make_markdown | safe | truncatewords_html:'20' }}
+                            <div class="readmore"><a href="{{ project.get_project_absolute_url }}" class="flat-box waves-effect waves-block"><i class="fas fa-book-open fa-fw" aria-hidden="true"></i> 项目详情</a></div>
+                        </section>
+                    </article>
+                </div>
+            {% endfor %}
+        </section>
+        <!-- 评论区 -->
+    </div>
+
+{% endblock %}
+
+

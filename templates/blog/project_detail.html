@@ -1,0 +1,71 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+{% load static %}
+{% block title %}{{ site_configs.name }} - {{ project.title }}{% endblock %}
+
+{% block l_main %}
+    <div class="l_main">
+        <!-- 正文部分 -->
+        <article id="post" class="post white-box article-type-post" itemscope="" itemprop="blogPost">
+            <!-- 标题 -->
+            <section class="meta">
+                <div class="meta" id="header-meta">
+                    <h1 class="title">{{ project.title }}</h1>
+                    <div class="new-meta-box">
+                        <div class="new-meta-item date"><a class="notlink"><i class="fas fa-clock" aria-hidden="true"></i> {{ project.created_time | date:'Y-m-d H:i:s' }}</a></div>
+                        <div class="new-meta-item browse busuanzi"><a class="notlink"><i class="fas fa-eye" aria-hidden="true"></i> <span id="busuanzi_value_page_pv">{{ project.views }}</span></a></div>
+                    </div>
+                    <hr>
+                </div>
+            </section>
+            <!-- 正文 -->
+            <section class="article typo">
+                <div class="article-entry" itemprop="articleBody">{{ project.content | make_markdown | safe }}</div>
+
+                <section class="meta" id="footer-meta">
+                    <hr>
+                    <div class="new-meta-box">
+                        <div class="new-meta-item date" itemprop="dateUpdated">
+                            <a class="notlink"><i class="fas fa-pencil-alt" aria-hidden="true"></i> {{ project.modified_time | date:'Y-m-d H:i:s' }}</a>
+                        </div>
+                    </div>
+                </section>
+
+
+            </section>
+        </article>
+        <br>
+
+
+        <!-- 评论区 -->
+        <article class="post white-box comments">
+            <section class="article typo">
+                <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+
+                <!-- Gitalk 评论 start  -->
+                <!-- Link Gitalk 的支持文件  -->
+                <link rel="stylesheet" href="{% static 'css/gitalk.css' %}">
+                <script src="{% static 'js/gitalk.min.js' %}"></script>
+
+                <div id="gitalk-container"></div>
+                <script type="text/javascript">
+                    var gitalk = new Gitalk({
+                        // gitalk的主要参数
+                        clientID: '{{ site_configs.client_id }}',
+                        clientSecret: '{{ site_configs.client_secret }}',
+                        repo: '{{ site_configs.repo }}',
+                        owner: '{{ site_configs.owner }}',
+                        admin: ['{{ site_configs.admin }}'],
+                        id: "{{ project.get_absolute_url }}",
+                        distractionFreeMode: false
+                    });gitalk.render('gitalk-container');
+                </script>
+                <!-- Gitalk end -->
+
+            </section>
+        </article>
+
+        <script>window.subData={title:"{{ project.title }}",tools:!0}</script>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+
+
+{% block title %}{{ site_configs.name }} - 所有分类{% endblock %}
+
+{% block l_main %}
+<div class="l_main">
+    <article id="archive-page" class="post article white-box">
+        <section class="archive">
+        {% for category in categories %}
+            <div class="archive-item archive-year mark"><h2>{{ category.name }}</h2><hr></div>
+            {% for article in articles %}
+                {% if article.category.name == category.name %}
+                <div class="archive-item archive-post mark">
+                    <a href="{{ article.get_absolute_url }}">
+                        <time>{{ article.created_time | date:'Y-m-d H:m:i' }}</time>
+                        <span class="title">{{ article.title }}</span>
+                    </a>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+        {% empty %}
+            找不到任何文章!
+        {% endfor %}
+        </section>
+    </article>
+</div>
+
+
+{% endblock %}
